@@ -38,22 +38,22 @@ Objective:
 - Establish runnable local containerized baseline with FastAPI backend and scripts.
 
 Checklist:
-- [ ] Add Docker setup for single-container app.
-- [ ] Initialize backend app in `backend/` using FastAPI.
-- [ ] Configure backend to serve simple static hello page at `/`.
-- [ ] Add sample API route (for example `/api/health`) and verify from served page.
-- [ ] Add start/stop scripts for Mac, Linux, and Windows under `scripts/`.
-- [ ] Wire environment loading for local `.env` usage.
+- [x] Add Docker setup for single-container app.
+- [x] Initialize backend app in `backend/` using FastAPI.
+- [x] Configure backend to serve simple static hello page at `/`.
+- [x] Add sample API route (for example `/api/health`) and verify from served page.
+- [x] Add start/stop scripts for Mac, Linux, and Windows under `scripts/`.
+- [x] Wire environment loading for local `.env` usage.
 
 Tests:
-- [ ] Backend unit tests for health route and app startup.
-- [ ] Integration test: container starts and `/` + `/api/health` respond correctly.
-- [ ] Script smoke tests: start then stop works on current OS.
+- [x] Backend unit tests for health route and app startup.
+- [x] Integration test: container starts and `/` + `/api/health` respond correctly.
+- [x] Script smoke tests: start then stop works on current OS.
 
 Success criteria:
-- `docker` run path works locally.
-- Visiting `/` returns hello page.
-- API call from page to backend succeeds.
+- [x] `docker` run path works locally.
+- [x] Visiting `/` returns hello page.
+- [x] API call from page to backend succeeds.
 
 ## Part 3: Serve Frontend Demo from Backend
 
