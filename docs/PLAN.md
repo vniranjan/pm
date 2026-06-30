@@ -82,20 +82,20 @@ Objective:
 - Gate Kanban behind login with `user` / `password` and allow logout.
 
 Checklist:
-- [ ] Add login UI route/view in frontend.
-- [ ] Add backend login endpoint validating hardcoded credentials.
-- [ ] Add simple session/token mechanism suitable for MVP.
-- [ ] Protect Kanban routes; unauthenticated users see login.
-- [ ] Implement logout flow clearing auth state.
+- [x] Add login UI route/view in frontend.
+- [x] Add backend login endpoint validating hardcoded credentials.
+- [x] Add simple session/token mechanism suitable for MVP.
+- [x] Protect Kanban routes; unauthenticated users see login.
+- [x] Implement logout flow clearing auth state.
 
 Tests:
-- [ ] Unit tests for credential validation and auth state transitions.
-- [ ] Integration tests: unauthenticated blocked; authenticated allowed.
-- [ ] UI integration test: login success + logout returns to login screen.
+- [x] Unit tests for credential validation and auth state transitions.
+- [x] Integration tests: unauthenticated blocked; authenticated allowed.
+- [x] UI integration test: login success + logout returns to login screen.
 
 Success criteria:
-- Only authenticated users can access Kanban.
-- Invalid credentials are rejected with clear error.
+- [x] Only authenticated users can access Kanban.
+- [x] Invalid credentials are rejected with clear error.
 
 ## Part 5: Database Modeling (SQLite + JSON Board State)
 

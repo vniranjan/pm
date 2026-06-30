@@ -5,9 +5,11 @@
 This directory contains the existing Next.js Kanban demo UI used as the starting point for the MVP.
 
 Current status:
-- Frontend-only implementation (no backend API integration yet).
-- Single page app at `/` rendering a 5-column Kanban board.
-- Local in-memory state only (resets on refresh).
+- Sign-in gate is implemented in frontend (`user` / `password`).
+- Unauthenticated users see login UI first.
+- After successful login, the 5-column Kanban board is shown.
+- Logout returns the user to the login screen.
+- Board state is still local in-memory (resets on refresh).
 
 ## Stack
 
@@ -23,10 +25,11 @@ Current status:
 - `src/app/layout.tsx`
   - Global layout, metadata, and font setup (`Space_Grotesk`, `Manrope`).
 - `src/app/page.tsx`
-  - App entrypoint. Renders `KanbanBoard`.
+  - App entrypoint. Renders `AuthGate`.
 - `src/app/globals.css`
   - Global CSS variables and base styles, aligned with project color scheme.
 - `src/components/`
+  - `AuthGate.tsx`: login/session check UI and auth flow.
   - `KanbanBoard.tsx`: top-level board state and DnD context.
   - `KanbanColumn.tsx`: editable column title, sortable cards, add-card form.
   - `KanbanCard.tsx`: draggable card with remove action.
@@ -43,7 +46,8 @@ Current status:
   - moved within and across columns via drag and drop
   - added to a column
   - removed from a column
-- No authentication, persistence, or AI integration yet.
+- Authentication is present (via backend auth API + cookie session).
+- Persistence and AI integration are not implemented yet.
 
 ## Testing Setup
 
