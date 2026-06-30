@@ -61,20 +61,20 @@ Objective:
 - Replace hello page with built Next.js frontend served through FastAPI at `/`.
 
 Checklist:
-- [ ] Configure frontend static build output for container use.
-- [ ] Copy/build frontend artifacts in Docker image.
-- [ ] Serve static frontend assets from FastAPI.
-- [ ] Ensure `/` loads existing demo Kanban UI.
-- [ ] Add `frontend/AGENTS.md` if still missing from Part 1.
+- [x] Configure frontend static build output for container use.
+- [x] Copy/build frontend artifacts in Docker image.
+- [x] Serve static frontend assets from FastAPI.
+- [x] Ensure `/` loads existing demo Kanban UI.
+- [x] Add `frontend/AGENTS.md` if still missing from Part 1.
 
 Tests:
-- [ ] Frontend unit tests for key Kanban rendering behavior.
-- [ ] Backend integration test verifies static asset route + index load.
-- [ ] End-to-end smoke test: Kanban board renders at `/`.
+- [x] Frontend unit tests for key Kanban rendering behavior.
+- [x] Backend integration test verifies static asset route + index load.
+- [x] End-to-end smoke test: Kanban board renders at `/`.
 
 Success criteria:
-- App root shows demo Kanban in containerized run.
-- Static assets load without path or MIME issues.
+- [x] App root shows demo Kanban in containerized run.
+- [x] Static assets load without path or MIME issues.
 
 ## Part 4: MVP Authentication Flow (Hardcoded Credentials)
 
