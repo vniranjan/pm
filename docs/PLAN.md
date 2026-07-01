@@ -101,13 +101,14 @@ Success criteria:
 
 Objective:
 - Define and document durable data model for one board per user (with multi-user-ready structure).
+- Detailed proposal document: `docs/DATABASE.md`
 
 Checklist:
-- [ ] Propose schema in docs and request user sign-off before implementation.
-- [ ] Model users table (future-ready, even with MVP single credentials).
-- [ ] Model board storage as JSON payload per user.
-- [ ] Document migration/initialization strategy (create DB if missing).
-- [ ] Document tradeoffs and MVP constraints.
+- [x] Propose schema in docs and request user sign-off before implementation.
+- [x] Model users table (future-ready, even with MVP single credentials).
+- [x] Model board storage as JSON payload per user.
+- [x] Document migration/initialization strategy (create DB if missing).
+- [x] Document tradeoffs and MVP constraints.
 
 Proposed schema (for approval):
 - `users`
@@ -127,8 +128,8 @@ Tests:
 - [ ] Integration test ensures one-board-per-user constraint.
 
 Success criteria:
-- Schema documented and approved by user before coding data layer.
-- DB bootstraps automatically if file does not exist.
+- [x] Schema documented and approved by user before coding data layer.
+- [x] DB bootstraps automatically if file does not exist.
 
 ## Part 6: Backend Kanban API
 
@@ -136,21 +137,21 @@ Objective:
 - Build CRUD-style endpoints needed by frontend to load and persist Kanban board.
 
 Checklist:
-- [ ] Add authenticated endpoint to fetch current user board.
-- [ ] Add authenticated endpoint to replace/update board JSON.
-- [ ] Validate payload shape minimally but clearly.
-- [ ] Ensure user isolation in queries by auth identity.
-- [ ] Add clear API error responses.
+- [x] Add authenticated endpoint to fetch current user board.
+- [x] Add authenticated endpoint to replace/update board JSON.
+- [x] Validate payload shape minimally but clearly.
+- [x] Ensure user isolation in queries by auth identity.
+- [x] Add clear API error responses.
 
 Tests:
-- [ ] Unit tests for service/repository logic.
-- [ ] Unit tests for payload validation.
-- [ ] Integration tests for auth + board read/write behavior.
-- [ ] Integration test for DB auto-create on first run.
+- [x] Unit tests for service/repository logic.
+- [x] Unit tests for payload validation.
+- [x] Integration tests for auth + board read/write behavior.
+- [x] Integration test for DB auto-create on first run.
 
 Success criteria:
-- Backend fully supports persisted Kanban for authenticated user.
-- API behavior is deterministic and tested.
+- [x] Backend fully supports persisted Kanban for authenticated user.
+- [x] API behavior is deterministic and tested.
 
 ## Part 7: Frontend/Backend Integration
 
@@ -297,5 +298,5 @@ Success criteria:
 ## Approval Gates
 
 - [x] Gate A: User approves this expanded plan before implementation begins.
-- [ ] Gate B: User approves DB schema documentation before Part 5 implementation.
+- [x] Gate B: User approves DB schema documentation before Part 5 implementation.
 - [ ] Gate C: User approves structured output schema before Part 9 implementation.
