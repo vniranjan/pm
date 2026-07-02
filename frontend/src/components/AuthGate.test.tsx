@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AuthGate } from "@/components/AuthGate";
+import { initialData } from "@/lib/kanban";
 
 const mockFetchResponse = (ok: boolean) =>
   Promise.resolve({
@@ -21,11 +22,25 @@ describe("AuthGate", () => {
   });
 
   it("logs in and logs out", async () => {
-    const fetchMock = vi
-      .fn()
-      .mockImplementationOnce(() => mockFetchResponse(false))
-      .mockImplementationOnce(() => mockFetchResponse(true))
-      .mockImplementationOnce(() => mockFetchResponse(true));
+    const fetchMock = vi.fn().mockImplementation((input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url === "/api/auth/me") {
+        return mockFetchResponse(false);
+      }
+      if (url === "/api/auth/login") {
+        return mockFetchResponse(true);
+      }
+      if (url === "/api/board") {
+        return Promise.resolve({
+          ok: true,
+          json: async () => initialData,
+        } as Response);
+      }
+      if (url === "/api/auth/logout") {
+        return mockFetchResponse(true);
+      }
+      return mockFetchResponse(false);
+    });
     vi.stubGlobal("fetch", fetchMock);
 
     render(<AuthGate />);

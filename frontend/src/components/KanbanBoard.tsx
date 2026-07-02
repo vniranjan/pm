@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -17,11 +17,111 @@ import { createId, initialData, moveCard, type BoardData } from "@/lib/kanban";
 
 type KanbanBoardProps = {
   onLogout?: () => Promise<void> | void;
+  enablePersistence?: boolean;
 };
 
-export const KanbanBoard = ({ onLogout }: KanbanBoardProps) => {
+const isBoardData = (value: unknown): value is BoardData => {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const candidate = value as Partial<BoardData>;
+  return Array.isArray(candidate.columns) && !!candidate.cards && typeof candidate.cards === "object";
+};
+
+export const KanbanBoard = ({ onLogout, enablePersistence = false }: KanbanBoardProps) => {
   const [board, setBoard] = useState<BoardData>(() => initialData);
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
+  const [isLoadingBoard, setIsLoadingBoard] = useState(enablePersistence);
+  const [loadError, setLoadError] = useState("");
+  const [saveError, setSaveError] = useState("");
+  const hasLoadedBoard = useRef(!enablePersistence);
+  const skipNextSave = useRef(enablePersistence);
+
+  useEffect(() => {
+    if (!enablePersistence) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadBoard = async () => {
+      setIsLoadingBoard(true);
+      setLoadError("");
+
+      try {
+        const response = await fetch("/api/board", {
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error("Board request failed");
+        }
+
+        const payload = (await response.json()) as unknown;
+        if (!isBoardData(payload)) {
+          throw new Error("Invalid board payload");
+        }
+
+        if (!cancelled) {
+          setBoard(payload);
+        }
+      } catch {
+        if (!cancelled) {
+          setLoadError("Unable to load saved board state.");
+        }
+      } finally {
+        if (!cancelled) {
+          hasLoadedBoard.current = true;
+          setIsLoadingBoard(false);
+        }
+      }
+    };
+
+    void loadBoard();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [enablePersistence]);
+
+  useEffect(() => {
+    if (!enablePersistence || !hasLoadedBoard.current || isLoadingBoard) {
+      return;
+    }
+
+    if (skipNextSave.current) {
+      skipNextSave.current = false;
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      const persistBoard = async () => {
+        try {
+          const response = await fetch("/api/board", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(board),
+          });
+
+          if (!response.ok) {
+            throw new Error("Board save failed");
+          }
+
+          setSaveError("");
+        } catch {
+          setSaveError("Unable to save board changes.");
+        }
+      };
+
+      void persistBoard();
+    }, 250);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [board, enablePersistence, isLoadingBoard]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -93,6 +193,26 @@ export const KanbanBoard = ({ onLogout }: KanbanBoardProps) => {
     });
   };
 
+  const handleUpdateCard = (cardId: string, title: string, details: string) => {
+    setBoard((prev) => {
+      const existing = prev.cards[cardId];
+      if (!existing) {
+        return prev;
+      }
+      return {
+        ...prev,
+        cards: {
+          ...prev.cards,
+          [cardId]: {
+            ...existing,
+            title,
+            details: details || "No details yet.",
+          },
+        },
+      };
+    });
+  };
+
   const activeCard = activeCardId ? cardsById[activeCardId] : null;
 
   return (
@@ -144,6 +264,15 @@ export const KanbanBoard = ({ onLogout }: KanbanBoardProps) => {
               </div>
             ))}
           </div>
+          {isLoadingBoard ? (
+            <p className="text-sm text-[var(--gray-text)]">Loading saved board...</p>
+          ) : null}
+          {loadError ? (
+            <p className="text-sm font-medium text-[var(--secondary-purple)]">{loadError}</p>
+          ) : null}
+          {saveError ? (
+            <p className="text-sm font-medium text-[var(--secondary-purple)]">{saveError}</p>
+          ) : null}
         </header>
 
         <DndContext
@@ -161,6 +290,7 @@ export const KanbanBoard = ({ onLogout }: KanbanBoardProps) => {
                 onRename={handleRenameColumn}
                 onAddCard={handleAddCard}
                 onDeleteCard={handleDeleteCard}
+                onUpdateCard={handleUpdateCard}
               />
             ))}
           </section>

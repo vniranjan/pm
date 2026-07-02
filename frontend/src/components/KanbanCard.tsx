@@ -1,20 +1,47 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
+import { FormEvent, useState } from "react";
 import type { Card } from "@/lib/kanban";
 
 type KanbanCardProps = {
   card: Card;
   onDelete: (cardId: string) => void;
+  onUpdate: (cardId: string, title: string, details: string) => void;
 };
 
-export const KanbanCard = ({ card, onDelete }: KanbanCardProps) => {
+export const KanbanCard = ({ card, onDelete, onUpdate }: KanbanCardProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: card.id });
+  const [isEditing, setIsEditing] = useState(false);
+  const [titleDraft, setTitleDraft] = useState(card.title);
+  const [detailsDraft, setDetailsDraft] = useState(card.details);
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+  };
+
+  const handleEditStart = () => {
+    setTitleDraft(card.title);
+    setDetailsDraft(card.details);
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
+    setTitleDraft(card.title);
+    setDetailsDraft(card.details);
+    setIsEditing(false);
+  };
+
+  const handleSave = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const title = titleDraft.trim();
+    if (!title) {
+      return;
+    }
+    onUpdate(card.id, title, detailsDraft.trim());
+    setIsEditing(false);
   };
 
   return (
@@ -30,24 +57,68 @@ export const KanbanCard = ({ card, onDelete }: KanbanCardProps) => {
       {...listeners}
       data-testid={`card-${card.id}`}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h4 className="font-display text-base font-semibold text-[var(--navy-dark)]">
-            {card.title}
-          </h4>
-          <p className="mt-2 text-sm leading-6 text-[var(--gray-text)]">
-            {card.details}
-          </p>
+      {isEditing ? (
+        <form onSubmit={handleSave} className="space-y-3">
+          <input
+            value={titleDraft}
+            onChange={(event) => setTitleDraft(event.target.value)}
+            className="w-full rounded-xl border border-[var(--stroke)] px-3 py-2 text-sm font-medium text-[var(--navy-dark)] outline-none transition focus:border-[var(--primary-blue)]"
+            aria-label={`Edit title for ${card.title}`}
+            required
+          />
+          <textarea
+            value={detailsDraft}
+            onChange={(event) => setDetailsDraft(event.target.value)}
+            rows={3}
+            className="w-full resize-none rounded-xl border border-[var(--stroke)] px-3 py-2 text-sm text-[var(--gray-text)] outline-none transition focus:border-[var(--primary-blue)]"
+            aria-label={`Edit details for ${card.title}`}
+          />
+          <div className="flex items-center gap-2">
+            <button
+              type="submit"
+              className="rounded-full bg-[var(--secondary-purple)] px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-white transition hover:brightness-110"
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="rounded-full border border-[var(--stroke)] px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-[var(--gray-text)] transition hover:text-[var(--navy-dark)]"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      ) : (
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h4 className="font-display text-base font-semibold text-[var(--navy-dark)]">
+              {card.title}
+            </h4>
+            <p className="mt-2 text-sm leading-6 text-[var(--gray-text)]">
+              {card.details}
+            </p>
+          </div>
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={handleEditStart}
+              className="rounded-full border border-transparent px-2 py-1 text-xs font-semibold text-[var(--gray-text)] transition hover:border-[var(--stroke)] hover:text-[var(--navy-dark)]"
+              aria-label={`Edit ${card.title}`}
+            >
+              Edit
+            </button>
+            <button
+              type="button"
+              onClick={() => onDelete(card.id)}
+              className="rounded-full border border-transparent px-2 py-1 text-xs font-semibold text-[var(--gray-text)] transition hover:border-[var(--stroke)] hover:text-[var(--navy-dark)]"
+              aria-label={`Delete ${card.title}`}
+            >
+              Remove
+            </button>
+          </div>
         </div>
-        <button
-          type="button"
-          onClick={() => onDelete(card.id)}
-          className="rounded-full border border-transparent px-2 py-1 text-xs font-semibold text-[var(--gray-text)] transition hover:border-[var(--stroke)] hover:text-[var(--navy-dark)]"
-          aria-label={`Delete ${card.title}`}
-        >
-          Remove
-        </button>
-      </div>
+      )}
     </article>
   );
 };

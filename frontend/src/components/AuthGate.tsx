@@ -129,5 +129,5 @@ export const AuthGate = () => {
     );
   }
 
-  return <KanbanBoard onLogout={handleLogout} />;
+  return <KanbanBoard onLogout={handleLogout} enablePersistence />;
 };

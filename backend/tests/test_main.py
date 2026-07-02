@@ -156,3 +156,35 @@ def test_board_validation_rejects_card_key_mismatch(tmp_path: Path) -> None:
     response = client.put("/api/board", json=invalid_board)
     assert response.status_code == 422
     assert "must match card.id" in response.json()["detail"]
+
+
+def test_board_changes_persist_across_new_session(tmp_path: Path) -> None:
+    db_path = tmp_path / "app.db"
+
+    first_client = TestClient(build_app(db_path=db_path))
+    login = first_client.post(
+        "/api/auth/login",
+        json={"username": "user", "password": "password"},
+    )
+    assert login.status_code == 200
+
+    board = first_client.get("/api/board").json()
+    board["columns"][0]["title"] = "Persisted Column"
+    update = first_client.put("/api/board", json=board)
+    assert update.status_code == 200
+
+    logout = first_client.post("/api/auth/logout")
+    assert logout.status_code == 200
+
+    sessions.clear()
+
+    second_client = TestClient(build_app(db_path=db_path))
+    relogin = second_client.post(
+        "/api/auth/login",
+        json={"username": "user", "password": "password"},
+    )
+    assert relogin.status_code == 200
+
+    reloaded_board = second_client.get("/api/board")
+    assert reloaded_board.status_code == 200
+    assert reloaded_board.json()["columns"][0]["title"] == "Persisted Column"
